@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.member.domain.MemberRepository">
+
+    <resultMap id="MemberWithImageMap" type="com.ssafy.thezip.member.domain.Member">
+        <id property="memberId" column="member_id" />
+        <result property="username" column="user_name" />
+        <result property="password" column="password" />
+        <result property="nickname" column="nickname" />
+        <result property="gender" column="gender" />
+        <result property="role" column="role" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="deletedAt" column="delete_at" />
+        <result property="collegeId" column="college_id"/>
+        <!-- Image 객체와의 매핑 -->
+        <association property="profile" javaType="com.ssafy.thezip.common.Image.domain.Image">
+            <id property="imageId" column="image_id" />
+            <result property="imageUrl" column="image_url" />
+            <result property="imageType" column="image_type" />
+            <result property="referenceId" column="reference_id" />
+            <result property="createdAt" column="image_created_at" />
+            <result property="updatedAt" column="image_updated_at" />
+        </association>
+    </resultMap>
+
+    <resultMap id="MemberGetResponse" type="com.ssafy.thezip.member.dto.response.MemberGetResponse">
+        <id property="memberId" column="member_id" />
+        <result property="username" column="user_name" />
+        <result property="nickname" column="nickname" />
+        <result property="gender" column="gender" />
+        <result property="isBlocked" column="isBlocked" />
+        <result property="role" column="role" />
+        <result property="createdAt" column="created_at" />
+        <result property="deletedAt" column="deleted_at" />
+        <result property="collegeId" column="college_id"/>
+        <association property="profile" javaType="com.ssafy.thezip.common.Image.domain.Image">
+            <id property="imageId" column="image_id" />
+            <result property="imageUrl" column="image_url" />
+            <result property="imageType" column="image_type" />
+            <result property="createdAt" column="created_at"/>
+            <result property="referenceId" column="reference_id"/>
+        </association>
+    </resultMap>
+
+
+    <select id="findByUsername" resultMap="MemberWithImageMap" parameterType="String">
+        SELECT
+        m.member_id,
+        m.user_name,
+        m.password,
+        m.nickname,
+        m.gender,
+        m.isBlocked,
+        m.role,
+        m.college_id,
+        m.created_at,
+        m.deleted_at,
+        i.image_id,
+        i.image_url,
+        i.image_type
+        FROM
+        member m
+        LEFT JOIN
+        image i ON m.member_id = i.reference_id
+        WHERE
+        m.user_name = #{username}
+        order by i.image_id desc limit 1
+    </select>
+
+    <select id="findById" resultMap="MemberWithImageMap">
+        SELECT
+        m.member_id,
+        m.user_name,
+        m.nickname,
+        m.gender,
+        m.isBlocked,
+        m.role,
+        m.college_id,
+        m.created_at,
+        m.deleted_at,
+        i.image_id,
+        i.image_url,
+        i.image_type,
+        i.created_at,
+        i.reference_id
+        FROM
+        member m
+        LEFT JOIN
+        image i ON m.member_id = i.reference_id
+        WHERE
+        m.member_id = #{id}
+    </select>
+
+
+    <select id="findByUsernameAll" resultMap="MemberWithImageMap" parameterType="string">
+        SELECT
+        m.member_id,
+        m.user_name,
+        m.password,
+        m.nickname,
+        m.gender,
+        m.isBlocked,
+        m.role,
+        m.college_id,
+        m.created_at,
+        m.updated_at,
+
+        i.image_id,
+        i.image_url,
+        i.image_type,
+        i.reference_id,
+        i.created_at AS image_created_at,
+        i.updated_at AS image_updated_at
+        FROM
+        member m
+        LEFT JOIN
+        image i ON m.member_id = i.reference_id
+        WHERE
+        m.user_name = #{username}
+    </select>
+
+    <select id="existsByNickname" resultType="boolean" parameterType="String">
+        SELECT COUNT(*) > 0 FROM member WHERE nickname = #{nickname}
+    </select>
+
+
+    <select id="existsByUsername" resultType="boolean" parameterType="String">
+        SELECT COUNT(*) > 0 FROM member WHERE user_name = #{username}
+   </select>
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="memberId" keyColumn="member_id">
+        insert into member (user_name, password, nickname, gender, role)
+        values(#{username},#{password}, #{nickname}, #{gender}, #{role})
+    </insert>
+
+    <update id="update">
+        UPDATE member
+        <set>
+            <if test="password != null and password.trim() != '' and password != 'null' ">
+                password = #{password},
+            </if>
+            <if test="nickname != null and nickname.trim() != '' and nickname != 'null' ">
+                nickname = #{nickname},
+            </if>
+            <if test="gender != null and gender.name() != 'null' ">
+                gender = #{gender},
+            </if>
+            <if test="isBlocked != null and isBlocked != 'null' ">
+                isBlocked = #{isBlocked},
+            </if>
+            <if test="role != null">
+                role = #{role}
+            </if>
+        </set>
+        <where>
+            user_name = #{username}
+        </where>
+    </update>
+
+    <update id="updateCollegeId">
+        UPDATE member
+        set
+        college_id = #{collegeId}
+        where member_id = #{memberId}
+    </update>
+
+</mapper>

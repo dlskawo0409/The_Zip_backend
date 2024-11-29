@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.charter.domain.CharterRepository">
+
+
+    <resultMap id="CharterResultMap" type="com.ssafy.thezip.charter.dto.response.CharterInfoResponseDTO">
+        <id property="charterId" column="charter_id" />
+        <result property="dongCode" column="dong_code" />
+        <result property="charterKind" column="charter_kind" />
+        <result property="floor" column="floor" />
+        <result property="dealYear" column="deal_year" />
+        <result property="dealMonth" column="deal_month" />
+        <result property="dealDay" column="deal_day" />
+        <result property="deposit" column="deposit" />
+        <result property="rent" column="rent"/>
+        <result property="name" column="name" />
+        <result property="size" column="size" />
+        <result property="constructionYear" column="construction_year" />
+        <result property="buildingUse" column="building_use" />
+        <result property="memberId" column="member_id" />
+        <result property="charterDong" column="charter_dong"/>
+        <result property="charterGu" column="charter_gu"/>
+        <result property="bonbun" column="bonbun"/>
+        <result property="bubun" column="bubun"/>
+        <result property="isInterested" column="is_interested" />
+        <result property="likes" column="likes"/>
+        <association property="image" javaType="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+            <id property="imageId" column="image_id"/>
+            <result property="imageURL" column="image_url"/>
+            <result property="imageType" column="image_type"/>
+        </association>
+    </resultMap>
+    
+    <resultMap id="CharterResultMapByName" type="com.ssafy.thezip.charter.dto.response.CharterInfoListResponseDTO">
+        <id property="charterId" column="charter_id" />
+        <result property="charterKind" column="charter_kind" />
+        <result property="floor" column="floor" />
+        <result property="deposit" column="deposit" />
+        <result property="rent" column="rent"/>
+        <result property="name" column="name" />
+        <result property="size" column="size" />
+        <result property="constructionYear" column="construction_year" />
+        <result property="buildingUse" column="building_use" />
+        <result property="charterDong" column="charter_dong"/>
+        <result property="charterGu" column="charter_gu"/>
+        <result property="bonbun" column="bonbun"/>
+        <result property="bubun" column="bubun"/>
+        <result property="isInterested" column="is_interested" />
+    </resultMap>
+
+
+
+    <select id="findCharterByDongCode" resultMap="CharterResultMap" >
+        SELECT
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deal_year,
+        c.deal_month,
+        c.deal_day,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.member_id,
+        c.charter_dong,
+        c.charter_gu,
+        c.bonbun,
+        c.bubun,
+        c.pre_code,
+        c.post_code,
+
+        CASE
+        WHEN ic.interest_charter_id IS NOT NULL THEN 'T'
+        ELSE 'F'
+        END AS is_interested,
+        IFNULL(ic2.likes, 0) AS likes,
+        img.image_id,
+        img.image_url,
+        img.image_type
+        FROM
+        charter c
+        LEFT JOIN
+        (
+        SELECT
+        image_id, image_url, image_type, reference_id
+        FROM
+        image
+        WHERE
+        image_type = 'CHARTER'
+        ORDER BY
+        image_id DESC
+        ) img
+        ON
+        c.charter_id = img.reference_id
+        LEFT JOIN
+        interest_charter ic
+        ON
+        c.charter_id = ic.charter_id AND ic.member_id = #{memberId}
+
+        LEFT JOIN
+        (
+        SELECT charter_id, COUNT(*) AS likes
+        FROM interest_charter
+        GROUP BY charter_id
+        ) ic2 ON c.charter_id = ic2.charter_id
+
+        WHERE
+        c.pre_code = #{charterInfoDTO.preCode}
+        AND c.post_code = #{charterInfoDTO.postCode}
+        <if test="charterInfoDTO.charterKind != null ">
+            AND c.charter_kind = #{charterInfoDTO.charterKind}
+        </if>
+        <if test="charterInfoDTO.deposit != null">
+            AND c.deposit BETWEEN #{charterInfoDTO.deposit.min} AND #{charterInfoDTO.deposit.max}
+        </if>
+        <if test="charterInfoDTO.rent != null">
+            AND c.rent BETWEEN #{charterInfoDTO.rent.min} AND #{charterInfoDTO.rent.max}
+        </if>
+
+        LIMIT #{charterInfoDTO.start}, #{charterInfoDTO.limit}
+
+    </select>
+
+    <select id="findCountByDongCode" resultType="long">
+        SELECT COUNT(*)
+        FROM charter c
+        WHERE
+        pre_code = #{preCode}
+        AND post_code = #{postCode}
+        <if test="charterKind != null">
+            AND c.charter_kind = #{charterKind}
+        </if>
+        <if test="deposit != null">
+            AND c.deposit BETWEEN #{deposit.min} AND #{deposit.max}
+        </if>
+        <if test="rent != null">
+            AND c.rent BETWEEN #{rent.min} AND #{rent.max}
+        </if>
+    </select>
+
+    <select id="findCharterByMemberId" resultMap="CharterResultMap">
+        SELECT
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deal_year,
+        c.deal_month,
+        c.deal_day,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.member_id,
+        c.charter_dong,
+        c.charter_gu,
+        c.bonbun,
+        c.bubun,
+        c.pre_code,
+        c.post_code,
+        IFNULL(ic2.likes, 0) AS likes,
+        img.image_id,
+        img.image_url,
+        img.image_type
+        FROM
+        charter AS c
+        LEFT JOIN (
+        SELECT
+        image_id,
+        image_url,
+        image_type,
+        reference_id
+        FROM
+        image
+        WHERE
+        image_type = 'CHARTER'
+        ORDER BY
+        image_id DESC
+        ) img ON c.charter_id = img.reference_id
+
+        LEFT JOIN (
+        SELECT
+        ic.charter_id,
+        COUNT(*) AS likes
+        FROM
+        interest_charter ic
+        GROUP BY
+        ic.charter_id
+        ) ic2 ON c.charter_id = ic2.charter_id
+
+        WHERE
+        c.member_id = #{memberId};
+        <!--        LIMIT #{limit} OFFSET #{start}-->
+    </select>
+
+    <select id="findById" resultMap="CharterResultMap">
+        SELECT
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deal_year,
+        c.deal_month,
+        c.deal_day,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.member_id,
+        c.charter_dong,
+        c.charter_gu,
+        c.bonbun,
+        c.bubun,
+        c.pre_code,
+        c.post_code,
+
+        CASE
+        WHEN ic.interest_charter_id IS NOT NULL THEN 'T'
+        ELSE 'F'
+        END AS is_interested,
+        IFNULL(ic2.likes, 0) AS likes,
+        img.image_id,
+        img.image_url,
+        img.image_type
+        FROM
+        charter c
+        LEFT JOIN
+        (
+        SELECT image_id, image_url, image_type, reference_id
+        FROM image
+        WHERE image_type = 'CHARTER'
+        ORDER BY image_id DESC
+        ) img
+        ON
+        c.charter_id = img.reference_id
+        LEFT JOIN
+        interest_charter ic
+        ON
+        c.charter_id = ic.charter_id AND ic.member_id = #{memberId}
+
+        LEFT JOIN (
+        SELECT
+        ic.charter_id,
+        COUNT(*) AS likes
+        FROM
+        interest_charter ic
+        GROUP BY
+        ic.charter_id
+        ) ic2 ON c.charter_id = ic2.charter_id
+
+
+        WHERE
+        c.charter_id = #{charterId};
+
+    </select>
+
+
+    <select id="findByName" resultMap="CharterResultMapByName">
+        select
+        charter_id,
+        charter_kind,
+        floor,
+        deposit,
+        rent,
+        name,
+        size,
+        construction_year,
+        building_use,
+        charter_dong,
+        charter_gu,
+        bonbun,
+        bubun,
+        pre_code,
+        post_code
+        from charter
+        WHERE MATCH(name) AGAINST(#{name} IN NATURAL LANGUAGE MODE)
+        ORDER BY name
+    </select>
+
+    <select id="findCharterBySidoGugunDong" resultMap="CharterResultMap">
+        SELECT
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deal_year,
+        c.deal_month,
+        c.deal_day,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.member_id,
+        c.charter_dong,
+        c.charter_gu,
+        c.bonbun,
+        c.bubun,
+        c.pre_code,
+        c.post_code,
+
+        CASE
+        WHEN ic.interest_charter_id IS NOT NULL THEN 'T'
+        ELSE 'F'
+        END AS is_interested,
+
+        IFNULL(ic2.likes, 0) AS likes,
+        img.image_id,
+        img.image_url,
+        img.image_type
+
+        FROM
+        charter c
+        LEFT JOIN
+        (
+        SELECT
+        image_id, image_url, image_type, reference_id
+        FROM
+        image
+        WHERE
+        image_type = 'CHARTER'
+        ORDER BY
+        image_id DESC
+        ) img
+        ON
+        c.charter_id = img.reference_id
+        LEFT JOIN
+        interest_charter ic
+        ON
+        c.charter_id = ic.charter_id AND ic.member_id = #{memberId}
+
+        LEFT JOIN (
+        SELECT
+        ic.charter_id,
+        COUNT(*) AS likes
+        FROM
+        interest_charter ic
+        GROUP BY
+        ic.charter_id
+        ) ic2 ON c.charter_id = ic2.charter_id
+
+
+        WHERE
+        c.pre_code = #{charterInfoBySidoGugunDongDTO.preCode}
+        AND c.post_code = #{charterInfoBySidoGugunDongDTO.postCode}
+        AND c.charter_kind = #{charterInfoBySidoGugunDongDTO.charterKind}
+        LIMIT #{charterInfoBySidoGugunDongDTO.start}, #{charterInfoBySidoGugunDongDTO.limit};
+    </select>
+
+
+    <select id="findByLikes" resultMap="CharterResultMap">
+
+        SELECT
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deal_year,
+        c.deal_month,
+        c.deal_day,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.member_id,
+        c.charter_gu,
+        c.charter_dong,
+        c.bonbun,
+        c.bubun,
+        c.pre_code,
+        c.post_code,
+        IFNULL(ic_count.likes, 0) AS likes,
+        img.image_url,
+        img.image_type
+        FROM
+        charter c
+        JOIN
+        (SELECT
+        ic.charter_id, COUNT(ic.charter_id) AS likes
+        FROM
+        interest_charter ic
+        GROUP BY
+        ic.charter_id
+        ORDER BY
+        likes DESC
+        ) ic_count
+        ON
+        c.charter_id = ic_count.charter_id
+        LEFT JOIN
+        image img
+        ON
+        img.reference_id = c.charter_id
+        AND img.image_type = 'CHARTER'
+        WHERE
+        c.charter_kind = #{charterKind}
+
+        ORDER BY c.charter_id desc
+        LIMIT #{count}
+
+    </select>
+
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="charterId">
+        insert into charter
+        (
+        pre_code,
+        post_code,
+        charter_kind,
+        floor,
+        deposit,
+        rent,
+        name,
+        construction_year,
+        building_use,
+        size,
+        member_id,
+        charter_dong,
+        charter_gu,
+        bonbun,
+        bubun
+        <trim prefix="," suffixOverrides=",">
+            <if test="dealYear != null">deal_year,</if>
+            <if test="dealMonth != null">deal_month,</if>
+            <if test="dealDay != null">deal_day</if>
+        </trim>
+
+        )
+        VALUES
+        (
+        #{preCode},
+        #{postCode},
+        #{charterKind},
+        #{floor},
+        #{deposit},
+        #{rent},
+        #{name},
+        #{constructionYear},
+        #{buildingUse},
+        #{size},
+        #{memberId},
+        #{charterDong},
+        #{charterGu},
+        #{bonbun},
+        #{bubun}
+        <trim prefix="," suffixOverrides=",">
+            <if test="dealYear != null">#{dealYear},</if>
+            <if test="dealMonth != null">#{dealMonth},</if>
+            <if test="dealDay != null">#{dealDay}</if>
+        </trim>
+
+        )
+    </insert>
+
+    <!-- Update statement for the charter table -->
+    <update id="updateCharter" parameterType="map">
+        UPDATE charter
+        <set>
+            <!-- 필요한 필드를 선택적으로 업데이트 -->
+            <if test="charterUpdateDTO.preCode != null and !charterUpdateDTO.preCode.isEmpty()">pre_code = #{charterUpdateDTO.preCode},</if>
+            <if test="charterUpdateDTO.postCode != null and !charterUpdateDTO.postCode.isEmpty()">post_code = #{charterUpdateDTO.postCode},</if>
+            <if test="charterUpdateDTO.charterKind != null">charter_kind = #{charterUpdateDTO.charterKind},</if>
+            <if test="charterUpdateDTO.floor != null and !charterUpdateDTO.floor.isEmpty()">floor = #{charterUpdateDTO.floor},</if>
+            <if test="charterUpdateDTO.dealYear != null">deal_year = #{charterUpdateDTO.dealYear},</if>
+            <if test="charterUpdateDTO.dealMonth != null">deal_month = #{charterUpdateDTO.dealMonth},</if>
+            <if test="charterUpdateDTO.dealDay != null">deal_day = #{charterUpdateDTO.dealDay},</if>
+            <if test="charterUpdateDTO.deposit != null">deposit = #{charterUpdateDTO.deposit},</if>
+            <if test="charterUpdateDTO.rent != null">rent = #{charterUpdateDTO.rent},</if>
+            <if test="charterUpdateDTO.name != null and !charterUpdateDTO.name.isEmpty()">name = #{charterUpdateDTO.name},</if>
+            <if test="charterUpdateDTO.size != null">size = #{charterUpdateDTO.size},</if>
+            <if test="charterUpdateDTO.constructionYear != null">construction_year = #{charterUpdateDTO.constructionYear},</if>
+            <if test="charterUpdateDTO.charterGu != null">charter_gu = #{charterUpdateDTO.charterGu},</if>
+            <if test="charterUpdateDTO.charterDong != null">charter_dong = #{charterUpdateDTO.charterDong},</if>
+            <if test="charterUpdateDTO.buildingUse != null">building_use = #{charterUpdateDTO.buildingUse},</if>
+            <if test="charterUpdateDTO.bonbun != null">bonbun = #{charterUpdateDTO.bonbun},</if>
+            <if test="charterUpdateDTO.bubun != null">bubun = #{charterUpdateDTO.bubun}</if>
+        </set>
+        WHERE charter_id = #{charterUpdateDTO.charterId}
+        <if test="memberId != null">
+            and member_id = #{memberId};
+        </if>
+    </update>
+
+    <delete id="delete">
+        DELETE FROM charter
+        where charter_id = #{charterId}
+        <if test="memberId != null">
+            and member_id = #{memberId};
+        </if>
+    </delete>
+
+
+
+</mapper>

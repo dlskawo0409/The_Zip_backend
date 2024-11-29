@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.interest_charter.domain.InterestCharterRepository">
+    <!-- ResultMap 정의 -->
+    <resultMap id="InterestCharter" type="com.ssafy.thezip.interest_charter.dto.response.InterestCharterResponseDTO">
+        <id property="interestCharterId"  column="interest_charter_id" />
+        <result property="charterId" column="charter_id" />
+        <result property="charterKind" column="charter_kind" />
+        <result property="floor" column="floor" />
+        <result property="deposit" column="deposit" />
+        <result property="rent" column="rent" />
+        <result property="name" column="name" />
+        <result property="size" column="size" />
+        <result property="constructionYear" column="construction_year" />
+        <result property="buildingUse" column="building_use" />
+        <result property="charterDong" column="charter_dong" />
+        <result property="charterGu" column="charter_gu" />
+        <result property="bonbun" column="bonbun" />
+        <result property="bubun" column="bubun" />
+        <result property="likes" column="likes"/>
+        <association property="image" javaType="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+            <id property="imageId" column="image_id" />
+            <result property="imageURL" column="image_url" />
+            <result property="imageType" column="image_type" />
+        </association>
+    </resultMap>
+
+    <insert id="save">
+        INSERT INTO interest_charter (member_id, charter_id)
+        VALUES (#{memberId}, #{interestCharterInsertDTO.charterId})
+    </insert>
+
+    <select id="findByMemberId" resultMap="InterestCharter">
+        SELECT
+        ic.interest_charter_id ,
+        c.charter_id,
+        c.charter_kind,
+        c.floor,
+        c.deposit,
+        c.rent,
+        c.name,
+        c.size,
+        c.construction_year,
+        c.building_use,
+        c.charter_dong,
+        c.charter_gu,
+        c.bonbun,
+        c.bubun,
+        likes,
+        img.image_id,
+        img.image_url,
+        img.image_type
+        FROM
+        interest_charter ic
+        JOIN
+        charter c
+        ON
+        ic.charter_id = c.charter_id
+        LEFT JOIN
+        (
+        SELECT
+        image_id, image_url, image_type, reference_id
+        FROM
+        image
+        WHERE
+        image_type = 'CHARTER'
+        ORDER BY image_id DESC
+        ) img
+        ON
+        c.charter_id = img.reference_id
+
+        LEFT JOIN (
+        SELECT
+        ic.charter_id,
+        COUNT(*) AS likes
+        FROM
+        interest_charter ic
+        GROUP BY
+        ic.charter_id
+        ) ic2 ON c.charter_id = ic2.charter_id
+
+
+        WHERE
+        ic.member_id = #{memberId}
+        <if test="charterKind != null">
+            AND c.charter_kind = #{charterKind}
+        </if>
+    </select>
+
+
+    <delete id="delete">
+        delete from interest_charter
+        where member_id = #{memberId} and charter_id = #{charterId}
+    </delete>
+
+
+
+</mapper>

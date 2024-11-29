@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.interest_house.domain.InterestHouseRepository">
+    <!-- ResultMap 정의 -->
+    <resultMap id="InterestHouseWithHouseDeal" type="com.ssafy.thezip.interest_house.dto.response.InterestHouseWithHouseDeal">
+        <id property="interestHouseId" column="interest_house_id" />
+        <result property="aptSeq" column="apt_seq" />
+        <result property="imageURL" column="image_url"/>
+        <association property="houseInfo" javaType="com.ssafy.thezip.houseinfo.domain.HouseInfo">
+            <id property="aptSeq" column="apt_seq" />
+            <result property="dongName" column="umd_nm" />
+            <result property="jibun" column="jibun" />
+            <result property="roadName" column="road_nm" />
+            <result property="roadNameBonbun" column="road_nm_bonbun" />
+            <result property="roadNameBubun" column="road_nm_bubun" />
+            <result property="apartName" column="apt_nm" />
+            <result property="buildYear" column="build_year" />
+            <result property="latitude" column="latitude" />
+            <result property="longitude" column="longitude" />
+        </association>
+        <association property="houseDeal" javaType="com.ssafy.thezip.housedeal.domain.HouseDeal">
+            <result property="floor" column="floor" />
+<!--            <result property="dealYear" column="deal_year" />-->
+<!--            <result property="dealMonth" column="deal_month" />-->
+<!--            <result property="dealDay" column="deal_day" />-->
+            <result property="size" column="exclu_use_ar" />
+            <result property="dealAmount" column="deal_amount" />
+        </association>
+
+    </resultMap>
+
+    <insert id="save">
+        INSERT INTO interest_house (member_id, apt_seq)
+        VALUES (#{memberId}, #{interestHouseInsertDTO.aptSeq})
+    </insert>
+
+
+    <select id="findHouseDeal" resultMap="InterestHouseWithHouseDeal">
+        select
+        ih.interest_house_id,
+        ih.apt_seq,
+        hi.apt_seq,
+        hi.sgg_cd,
+        hi.umd_cd,
+        hi.umd_nm,
+        hi.jibun,
+        hi.road_nm,
+        hi.road_nm_bonbun,
+        hi.road_nm_bubun,
+        hi.apt_nm,
+        hi.build_year,
+        hi.latitude,
+        hi.longitude,
+        hi.floor,
+        hi.exclu_use_ar,
+        hi.deal_amount,
+        img.image_url
+        from
+        interest_house as ih
+        left join houseinfos as hi
+        on ih.apt_seq = hi.apt_seq
+
+        LEFT JOIN
+        (
+        SELECT image_url, reference_id
+        FROM image
+        WHERE image_type = 'APARTMENT'
+        ORDER BY image_id DESC
+        LIMIT 1
+        ) img
+        ON
+        hi.apt_seq = img.reference_id
+
+        where ih.member_id = #{memberId}
+
+    </select>
+    
+    <delete id="delete">
+        delete from interest_house
+        where apt_seq = #{aptSeq} and member_id = #{memberId}
+    </delete>
+
+<!--    <select id="existsByMemberIdAndInterestHouseId" resultType="boolean">-->
+<!--        SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END-->
+<!--        FROM interest_house-->
+<!--        WHERE member_id = #{memberId} AND apt_seq = #{aptSeq}-->
+<!--    </select>-->
+
+
+</mapper>

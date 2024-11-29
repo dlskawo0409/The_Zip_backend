@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.board_comment.domain.BoardCommentRepository">
+
+
+    <resultMap id="BoardGetResponse" type="com.ssafy.thezip.board_comment.domain.BoardComment">
+        <id property="commentId" column="comment_id" />
+        <result property="memberId" column="member_id"/>
+        <result property="content" column="content"/>
+        <result property="author" column="author"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+
+    <select id="findByBoardId" resultMap="BoardGetResponse">
+        select
+        comment_id,
+        member_id,
+        content,
+        author,
+        created_at
+        from comment
+        where board_id = #{boardId}
+    </select>
+
+    <select id="findByCommentId" resultMap="BoardGetResponse">
+        select
+        comment_id,
+        member_id,
+        content,
+        author,
+        created_at
+        from comment
+        where comment_id = #{commentId}
+    </select>
+
+
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="boardCommentRegisterResponseDTO.commentId">
+        insert into comment
+        (
+        board_id,
+        member_id,
+        content,
+        author
+        )
+        VALUES
+        (
+        #{boardCommentInsertDTO.boardId},
+        #{member.memberId},
+        #{boardCommentInsertDTO.content},
+        #{member.nickname}
+        )
+    </insert>
+
+
+
+<!--    <update id="update" parameterType="map">-->
+<!--        UPDATE board-->
+<!--        <if test="title != null">-->
+<!--            title = #{title},-->
+<!--        </if>-->
+<!--        <if test="content != null">-->
+<!--            content = #{content},-->
+<!--        </if>-->
+<!--        <if test="author">-->
+<!--            author = #{author}-->
+<!--        </if>-->
+
+<!--    </update>-->
+
+    <delete id="delete">
+        DELETE from comment
+        where comment_id = #{boardCommentId}
+    </delete>
+
+
+
+</mapper>

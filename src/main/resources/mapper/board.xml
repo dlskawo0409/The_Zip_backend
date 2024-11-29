@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.board.domain.BoardRepository">
+
+
+    <resultMap id="BoardGetResponse" type="com.ssafy.thezip.board.domain.Board">
+        <id property="boardId" column="board_id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="author" column="author" />
+        <result property="views" column="views" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="deletedAt" column="deleted_at" />
+    </resultMap>
+
+
+    <select id="findALL" resultMap="BoardGetResponse">
+        select *
+        from board
+    </select>
+
+    <insert id="save">
+        insert into board
+        (
+        title,
+        content,
+        author
+        )
+        VALUES
+        (
+        #{title},
+        #{content},
+        #{author}
+        )
+    </insert>
+
+
+    <!-- Update statement for the charter table -->
+    <update id="update" parameterType="map">
+        <if test="(title != null and title.trim() != '') or (content != null and content.trim() != '')">
+            UPDATE board
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="title != null and title.trim() != ''">
+                    title = #{title},
+                </if>
+                <if test="content != null and content.trim() != ''">
+                    content = #{content},
+                </if>
+            </trim>
+            <where>
+                board_id = #{boardId}
+            </where>
+        </if>
+    </update>
+
+
+    
+    <delete id="delete">
+        DELETE from board
+        where board_id = #{boardId}
+    </delete>
+
+
+
+</mapper>

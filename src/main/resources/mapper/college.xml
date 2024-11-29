@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.college.domain.CollegeRepository">
+
+    <resultMap id="college" type="com.ssafy.thezip.college.domain.College">
+        <id column="college_id" property="collegeId"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="college_english_name" property="collegeEnglishName"/>
+        <result column="branch_type" property="branchType"/>
+        <result column="region_name" property="regionName"/>
+        <result column="road_address" property="roadAddress"/>
+        <result column="homepage" property="homePage"/>
+    </resultMap>
+
+<!--    <insert id="save">-->
+<!--        insert college (college_dong , name, latitude, longitude, url)-->
+<!--        values (#{collegeDong}, #{name}, #{latitude}, #{longitude}, #{url})-->
+<!--    </insert>-->
+
+    <select id="findById">
+        select
+        college_id,
+        college_name,
+        college_english_name,
+        branch_type,
+        region_name,
+        road_address,
+        homepage
+        from college
+        where college_id = #{collegeId}
+    </select>
+
+    <select id="findByName">
+        select
+        college_id,
+        college_name,
+        college_english_name,
+        branch_type,
+        region_name,
+        road_address,
+        homepage
+        from college
+        where college_name like concat('%', #{name}, '%') or college_english_name like concat('%', #{name}, '%')
+    </select>
+
+<!--    <update id="update" parameterType="map">-->
+<!--        UPDATE college-->
+<!--        <set>-->
+<!--            &lt;!&ndash; 필요한 필드를 선택적으로 업데이트 &ndash;&gt;-->
+<!--            <if test="collegeDong != null">college_dong = #{collegeDong},</if>-->
+<!--            <if test="name">name = #{name},</if>-->
+<!--            <if test="latitude != null">latitude = #{latitude},</if>-->
+<!--            <if test="longitude != null">longitude = #{longitude},</if>-->
+<!--            <if test="url != null">url = #{url}</if>-->
+<!--        </set>-->
+<!--        WHERE college_id = #{collegeId}-->
+<!--    </update>-->
+
+<!--    <delete id="delete">-->
+<!--        delete from college-->
+<!--        where college_id = #{collegeId}-->
+<!--    </delete>-->
+
+
+</mapper>

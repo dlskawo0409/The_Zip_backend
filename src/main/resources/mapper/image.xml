@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.common.Image.domain.ImageRepository">
+
+    <resultMap id="imageResultMap" type="com.ssafy.thezip.common.Image.domain.Image">
+        <id property="imageId" column="image_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="created_at" column="created_at"/>
+        <result property="updated_at" column="updated_at"/>
+        <result property="deleted_at" column="deleted_at"/>
+    </resultMap>
+
+    <resultMap id="imageResponseDTO" type="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+        <id property="imageId" column="image_id"/>
+        <result property="imageURL" column="image_url"/>
+        <result property="imageType" column="image_type"/>
+    </resultMap>
+
+
+    <insert id="save" parameterType="com.ssafy.thezip.common.Image.domain.Image">
+        INSERT INTO image ( image_url, reference_id, image_type)
+        VALUES ( #{imageUrl}, #{referenceId}, #{imageType})
+    </insert>
+
+    <select id="findByImageId">
+        select *
+        from image
+        where image_id = #{imageId}
+    </select>
+
+    <select id="findByReferenceId" resultMap="imageResponseDTO">
+        select image_id, image_url, image_type
+        from image
+        where reference_id = #{referenceId} and image_type = #{imageType}
+    </select>
+
+<!--    <select id="findByImageList">-->
+<!--        select image_id-->
+<!--        from image-->
+<!--        where reference_id = #{referenceId}-->
+<!--    </select>-->
+
+
+    <delete id="deleteById">
+        delete from image
+        where = #{imageId}
+    </delete>
+
+    <update id="update">
+        UPDATE image
+        SET
+        image_url = #{imageUrl},
+        updated_at = #{updatedAt}
+        WHERE
+        image_id = #{imageId}
+    </update>
+
+
+</mapper>

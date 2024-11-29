@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.interest_area.domain.InterestAreaRepository">
+
+
+    <resultMap id="interestAreaResultMap" type="com.ssafy.thezip.interest_area.domain.InterestArea">
+        <id column="interest_area_id" property="interestAreaId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="dong_code" property="dongCode"/>
+    </resultMap>
+
+    <insert id="save">
+        INSERT INTO interest_area (member_id, name, dong_code)
+        VALUES (#{memberId}, #{name}, #{interestAreaInsertDTO.dongCode})
+    </insert>
+
+
+    <select id="findByMemberId" resultMap="interestAreaResultMap">
+        SELECT
+        interest_area_id,
+        member_id,
+        name,
+        dong_code
+        FROM
+        interest_area
+        WHERE member_id = #{memberId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM interest_area
+        WHERE interest_area_id = #{interestAreaId}
+    </delete>
+
+    <select id="existsByMemberIdAndInterestAreaId" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
+        FROM interest_area
+        WHERE member_id = #{memberId} AND interest_area_id = #{interestAreaId}
+    </select>
+
+
+</mapper>

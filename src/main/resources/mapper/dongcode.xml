@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.dongcode.domain.DongCodeRepository">
+
+    <resultMap id="SidoGugunDong" type="com.ssafy.thezip.dongcode.dto.response.SidoGugunDongResponseDTO">
+        <result property="sido" column="sido_name"/>
+        <result property="gugun" column="gugun_name"/>
+        <result property="dong" column="dong_name"/>
+    </resultMap>
+
+    <select id="findSido">
+        SELECT DISTINCT sido_name
+        FROM dongcodes
+        ORDER BY sido_name;
+    </select>
+
+    <select id="findGugunBySido">
+        SELECT DISTINCT gugun_name
+        FROM dongcodes
+        WHERE sido_name = #{sido} AND gugun_name IS NOT NULL  and dong_name is not null
+        ORDER BY gugun_name;
+    </select>
+    
+    <select id="findDongByGugun">
+        SELECT DISTINCT dong_name
+        FROM dongcodes
+        WHERE sido_name = #{sido} AND gugun_name = #{gugun} AND dong_name IS NOT NULL  and dong_name is not null
+        ORDER BY dong_name;
+    </select>
+
+    <select id="findDongCodeByDong" >
+        SELECT dong_code
+        FROM dongcodes
+        WHERE sido_name = #{sido} AND gugun_name = #{gugun} AND dong_name = #{dong};
+    </select>
+
+    <select id="findSidoGugunDongByDongCode" resultMap="SidoGugunDong">
+        SELECT sido_name, gugun_name, dong_name
+        FROM dongcodes
+        where dong_code = #{dongCode}
+    </select>
+
+
+
+</mapper>

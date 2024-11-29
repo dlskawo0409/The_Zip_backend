@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.thezip.houseinfo.domain.HouseInfoRepository">
+        <!-- ResultMap 정의 -->
+        <resultMap id="HouseInfoResultMap" type="com.ssafy.thezip.houseinfo.domain.HouseInfo">
+            <id property="aptSeq" column="apt_seq" />
+            <result property="dongName" column="umd_nm" />
+            <result property="jibun" column="jibun" />
+            <result property="roadName" column="road_nm" />
+            <result property="roadNameBonbun" column="road_nm_bonbun" />
+            <result property="roadNameBubun" column="road_nm_bubun" />
+            <result property="apartName" column="apt_nm" />
+            <result property="buildYear" column="build_year" />
+            <result property="latitude" column="latitude" />
+            <result property="longitude" column="longitude" />
+        </resultMap>
+
+    <resultMap id="HouseInfoResultMapWithHouseDeal"
+               type="com.ssafy.thezip.houseinfo.dto.response.HouseInfoWithHouseDeals">
+        <id property="aptSeq" column="apt_seq" />
+        <result property="preDongCode" column="sgg_cd" />
+        <result property="postDongCode" column="umd_cd" />
+        <result property="dongName" column="umd_nm" />
+        <result property="jibun" column="jibun" />
+        <result property="roadName" column="road_nm" />
+        <result property="roadNameBonbun" column="road_nm_bonbun" />
+        <result property="roadNameBubun" column="road_nm_bubun" />
+        <result property="apartName" column="apt_nm" />
+        <result property="buildYear" column="build_year" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
+        <result property="isInterested" column="is_interested" />
+        <result property="likes" column="likes" />
+        <association property="imageResponseDTO" javaType="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+            <id property="imageId" column="image_id"/>
+            <result property="imageURL" column="image_url"/>
+            <result property="imageType" column="image_type"/>
+        </association>
+        <collection property="houseDealList" ofType="com.ssafy.thezip.housedeal.domain.HouseDeal">
+            <id property="no" column="no" />
+            <result property="floor" column="floor" />
+            <result property="dealYear" column="deal_year" />
+            <result property="dealMonth" column="deal_month" />
+            <result property="dealDay" column="deal_day" />
+            <result property="size" column="exclu_use_ar" />
+            <result property="dealAmount" column="deal_amount" />
+        </collection>
+
+    </resultMap>
+
+    <resultMap id="HouseInfoResultMapWithHouseDealAndImages"
+               type="com.ssafy.thezip.houseinfo.dto.response.HouseInfoWithImagesDTO">
+        <id property="aptSeq" column="apt_seq" />
+        <result property="preDongCode" column="sgg_cd" />
+        <result property="postDongCode" column="umd_cd" />
+        <result property="dongName" column="umd_nm" />
+        <result property="jibun" column="jibun" />
+        <result property="roadName" column="road_nm" />
+        <result property="roadNameBonbun" column="road_nm_bonbun" />
+        <result property="roadNameBubun" column="road_nm_bubun" />
+        <result property="apartName" column="apt_nm" />
+        <result property="buildYear" column="build_year" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
+        <result property="isInterested" column="is_interested" />
+        <result property="likes" column="likes" />
+        <collection property="imageURLs" ofType="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+            <id property="imageId" column="image_id"/>
+            <result property="imageURL" column="image_url"/>
+            <result property="imageType" column="image_type"/>
+        </collection>
+        <collection property="houseDealList" ofType="com.ssafy.thezip.housedeal.domain.HouseDeal">
+            <id property="no" column="no" />
+            <result property="floor" column="floor" />
+            <result property="dealYear" column="deal_year" />
+            <result property="dealMonth" column="deal_month" />
+            <result property="dealDay" column="deal_day" />
+            <result property="size" column="exclu_use_ar" />
+            <result property="dealAmount" column="deal_amount" />
+        </collection>
+
+    </resultMap>
+    
+
+    <resultMap id="LatitudeAndLongitude" type="com.ssafy.thezip.houseinfo.dto.response.LatitudeAndLongitude">
+        <id property="aptSeq" column="apt_seq" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
+        <result property="dealAmount" column="deal_amount" />
+    </resultMap>
+
+
+    <resultMap id="HouseLikeMap" type="com.ssafy.thezip.houseinfo.dto.response.HouseInfoLikeDTO">
+        <id column="apt_seq" property="aptSeq"/>
+        <result property="dongName" column="umd_nm" />
+        <result column="jibun" property="jibun"/>
+        <result property="roadName" column="road_nm" />
+        <result property="roadNameBonbun" column="road_nm_bonbun" />
+        <result property="roadNameBubun" column="road_nm_bubun" />
+        <result property="apartName" column="apt_nm" />
+        <result column="build_year" property="buildYear"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="likes" property="likes"/>
+<!--        <result column="imageId" property="image_id"/>-->
+<!--        <result column="imageURL" property="image_url"/>-->
+        <association property="imageURLs" javaType="com.ssafy.thezip.common.Image.dto.response.ImageResponseDTO">
+            <id property="imageId" column="image_id"/>
+            <result property="imageType" column="image_type"/>
+            <result property="imageURL" column="image_url"/>
+        </association>
+        <association property="houseDeal" javaType="com.ssafy.thezip.housedeal.domain.HouseDeal">
+            <result property="floor" column="floor" />
+            <result property="dealYear" column="deal_year" />
+            <result property="dealMonth" column="deal_month" />
+            <result property="dealDay" column="deal_day" />
+            <result property="size" column="exclu_use_ar" />
+            <result property="dealAmount" column="deal_amount" />
+        </association>
+    </resultMap>
+
+
+        <select id="findAllByDongCode" resultMap="HouseInfoResultMapWithHouseDeal">
+            SELECT
+            hi.apt_seq,
+            hi.sgg_cd,
+            hi.umd_cd,
+            hi.umd_nm,
+            hi.jibun,
+            hi.road_nm,
+            hi.road_nm_bonbun,
+            hi.road_nm_bubun,
+            hi.apt_nm,
+            hi.build_year,
+            hi.latitude,
+            hi.longitude,
+            hd.no,
+            hd.floor,
+            hd.deal_year,
+            hd.deal_month,
+            hd.deal_day,
+            hd.exclu_use_ar,
+            hd.deal_amount,
+            img.image_id,
+            img.image_url,
+            img.image_type,
+            CASE
+            WHEN ih.apt_seq IS NOT NULL THEN 'T'
+            ELSE 'F'
+            END AS is_interested,
+            IFNULL(ihc.likes, 0) AS likes
+            FROM
+            houseinfos hi
+            LEFT JOIN
+            housedeals hd
+            ON
+            hi.apt_seq = hd.apt_seq
+            LEFT JOIN
+            (
+            SELECT image_id, image_url,image_type, reference_id
+            FROM image
+            WHERE image_type = 'APARTMENT'
+            ORDER BY image_id DESC
+            ) img
+            ON
+            hi.apt_seq = img.reference_id
+            LEFT JOIN
+            interest_house ih
+            ON
+            hi.apt_seq = ih.apt_seq AND ih.member_id = #{memberId}
+
+            LEFT JOIN
+            (
+            SELECT apt_seq, COUNT(*) AS likes
+            FROM interest_house
+            GROUP BY apt_seq
+            ) ihc ON hi.apt_seq = ihc.apt_seq
+
+
+            WHERE
+            hi.sgg_cd = #{houseInfoDTO.preDongCode}
+            AND hi.umd_cd = #{houseInfoDTO.postDongCode}
+            <if test="dealInfoDTO != null">
+                AND  CAST(REPLACE(hd.deal_amount, ',', '') AS UNSIGNED) BETWEEN #{dealInfoDTO.min} AND #{dealInfoDTO.max}
+            </if>
+
+            ORDER BY
+            hd.deal_year ASC, hd.deal_month ASC, hd.deal_day ASC;
+
+        </select>
+
+    <select id="findAllByDongCodeOnlyOne" resultMap="HouseInfoResultMapWithHouseDealAndImages">
+        SELECT
+        hi.apt_seq,
+        hi.sgg_cd,
+        hi.umd_cd,
+        hi.umd_nm,
+        hi.jibun,
+        hi.road_nm,
+        hi.road_nm_bonbun,
+        hi.road_nm_bubun,
+        hi.apt_nm,
+        hi.build_year,
+        hi.latitude,
+        hi.longitude,
+        hd.no,
+        hd.floor,
+        hd.deal_year,
+        hd.deal_month,
+        hd.deal_day,
+        hd.exclu_use_ar,
+        hd.deal_amount,
+        img.image_id,
+        img.image_url,
+        img.image_type,
+        CASE
+        WHEN #{memberId} IS NULL THEN 'F'
+        WHEN ih.apt_seq IS NOT NULL THEN 'T'
+        ELSE 'F'
+        END AS is_interested,
+        IFNULL(ihc.likes, 0) AS likes
+        FROM
+        houseinfos hi
+        LEFT JOIN
+        housedeals hd
+        ON
+        hi.apt_seq = hd.apt_seq
+        LEFT JOIN
+        (
+        SELECT image_id,image_url, image_type, reference_id
+        FROM image
+        WHERE image_type = 'APARTMENT'
+        ORDER BY image_id DESC
+        ) img
+        ON
+        hi.apt_seq = img.reference_id
+        LEFT JOIN
+        interest_house ih
+        ON
+        hi.apt_seq = ih.apt_seq AND ih.member_id = #{memberId}
+
+        LEFT JOIN
+        (
+        SELECT apt_seq, COUNT(*) AS likes
+        FROM interest_house
+        GROUP BY apt_seq
+        ) ihc ON hi.apt_seq = ihc.apt_seq
+
+
+        WHERE
+        hi.apt_seq = #{aptSeq}
+        ORDER BY
+        hd.deal_year ASC, hd.deal_month ASC, hd.deal_day ASC;
+
+    </select>
+
+
+    <select id="findLatitudeAndLongitudeByDongCode" resultMap="LatitudeAndLongitude">
+        SELECT
+        hi.apt_seq,
+        hi.latitude,
+        hi.longitude,
+        Min(hd.deal_amount) AS deal_amount
+        FROM houseinfos hi
+        LEFT JOIN housedeals as hd ON hd.apt_seq = hi.apt_seq
+        WHERE
+        hi.sgg_cd = #{preDongCode}
+        AND hi.umd_cd = #{postDongCode}
+        AND hi.latitude IS NOT NULL
+        AND hi.longitude IS NOT NULL
+        <if test="dealInfoDTO != null">
+            AND  CAST(REPLACE(hd.deal_amount, ',', '') AS UNSIGNED) BETWEEN #{dealInfoDTO.min} AND #{dealInfoDTO.max}
+        </if>
+        GROUP BY hi.apt_seq
+
+    </select>
+
+
+    <select id="findByName" resultMap="HouseInfoResultMap">
+        SELECT
+        apt_seq,
+        umd_nm,
+        jibun,
+        road_nm_sgg_cd,
+        road_nm,
+        road_nm_bonbun,
+        road_nm_bubun,
+        apt_nm,
+        build_year,
+        latitude,
+        longitude
+        FROM houseinfos
+        WHERE MATCH(apt_nm) AGAINST(#{aptName} IN NATURAL LANGUAGE MODE)
+        ORDER BY apt_nm
+    </select>
+
+<!--    <select id="findByRandom" resultMap="HouseRandomMap">-->
+<!--        SELECT-->
+<!--        hi.apt_seq,-->
+<!--        hi.umd_nm,-->
+<!--        hi.jibun,-->
+<!--        hi.road_nm,-->
+<!--        hi.road_nm_bonbun,-->
+<!--        hi.road_nm_bubun,-->
+<!--        hi.apt_nm,-->
+<!--        hi.build_year,-->
+<!--        hi.latitude,-->
+<!--        hi.longitude,-->
+<!--        hd.floor,-->
+<!--        hd.deal_year,-->
+<!--        hd.deal_month,-->
+<!--        hd.deal_day,-->
+<!--        hd.exclu_use_ar,-->
+<!--        hd.deal_amount,-->
+<!--        img.image_url-->
+<!--        FROM-->
+<!--        (SELECT-->
+<!--        apt_seq,-->
+<!--        umd_nm,-->
+<!--        jibun,-->
+<!--        road_nm,-->
+<!--        road_nm_bonbun,-->
+<!--        road_nm_bubun,-->
+<!--        apt_nm,-->
+<!--        build_year,-->
+<!--        latitude,-->
+<!--        longitude-->
+<!--        FROM houseinfos-->
+<!--        ORDER BY RAND()-->
+<!--        LIMIT #{count}) AS hi-->
+<!--        JOIN housedeals hd ON hi.apt_seq = hd.apt_seq-->
+<!--        AND (hd.deal_year, hd.deal_month, hd.deal_day) = (-->
+<!--        SELECT-->
+<!--        hd2.deal_year,-->
+<!--        hd2.deal_month,-->
+<!--        hd2.deal_day-->
+<!--        FROM-->
+<!--        housedeals hd2-->
+<!--        WHERE-->
+<!--        hd2.apt_seq = hi.apt_seq-->
+<!--        ORDER BY-->
+<!--        hd2.deal_year DESC,-->
+<!--        hd2.deal_month DESC,-->
+<!--        hd2.deal_day DESC-->
+<!--        LIMIT 1-->
+<!--        )-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT img1.image_url, img1.reference_id, img1.image_id-->
+<!--        FROM image img1-->
+<!--        WHERE img1.image_type = 'APARTMENT'-->
+<!--        ) img ON img.reference_id = hi.apt_seq-->
+<!--        AND img.image_id = (-->
+<!--        SELECT MAX(img2.image_id)-->
+<!--        FROM image img2-->
+<!--        WHERE img2.reference_id = hi.apt_seq-->
+<!--        AND img2.image_type = 'APARTMENT'-->
+<!--        )-->
+<!--        LIMIT #{count};-->
+<!--    </select>-->
+
+
+    <select id="findByLikes" resultMap="HouseLikeMap">
+        SELECT h.apt_seq,
+        h.umd_nm,
+        h.jibun,
+        h.road_nm,
+        h.road_nm_bonbun,
+        h.road_nm_bubun,
+        h.apt_nm,
+        h.build_year,
+        h.latitude,
+        h.longitude,
+        h.floor,
+        h.exclu_use_ar,
+        h.deal_amount,
+        COUNT(i.interest_house_id) AS likes,
+        MAX(ig.image_id) AS image_id,
+        ANY_VALUE(ig.image_type) AS image_type,
+        ANY_VALUE(ig.image_url) AS image_url
+        FROM houseinfos h
+        LEFT JOIN interest_house i ON h.apt_seq = i.apt_seq
+        LEFT JOIN image ig ON h.apt_seq = ig.reference_id AND ig.image_type = 'APARTMENT'
+        GROUP BY h.apt_seq
+        ORDER BY likes DESC, h.apt_seq
+        LIMIT #{count};
+    </select>
+
+</mapper>
